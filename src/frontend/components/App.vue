@@ -4,6 +4,11 @@
         <!-- header -->
         <div class="flex bg-white dark:bg-zinc-950 p-2 border-gray-300 dark:border-zinc-900 border-b min-h-16">
             <div class="flex w-full">
+                <button @click="toggleSidebar" class="my-auto mr-2 p-1.5 rounded-md text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-zinc-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
                 <div class="hidden sm:flex my-auto w-12 h-12 mr-2">
                     <img class="w-12 h-12" src="/assets/images/logo-chat-bubble.png" />
                 </div>
@@ -15,6 +20,18 @@
                     </div>
                 </div>
                 <div class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
+                    <button @click="toggleTheme" type="button" class="rounded-full">
+                        <span class="flex text-gray-700 dark:text-white bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-600 px-2 py-1 rounded-full">
+                            <!-- sun icon (shown in dark mode, click to go light) -->
+                            <svg v-if="config?.theme === 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                            </svg>
+                            <!-- moon icon (shown in light mode, click to go dark) -->
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                            </svg>
+                        </span>
+                    </button>
                     <button @click="syncPropagationNode" type="button" class="rounded-full">
                         <span class="flex text-gray-700 dark:text-white bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-600 px-2 py-1 rounded-full">
                             <span :class="{ 'animate-spin': isSyncingPropagationNode }">
@@ -40,10 +57,13 @@
         </div>
 
         <!-- middle -->
-        <div ref="middle" class="flex h-full w-full overflow-auto">
+        <div ref="middle" class="relative flex h-full w-full overflow-auto">
+
+            <!-- sidebar backdrop -->
+            <div v-show="!isSidebarCollapsed" @click="toggleSidebar" class="absolute inset-0 bg-black/40 z-20"></div>
 
             <!-- sidebar -->
-            <div class="bg-white flex w-72 min-w-72 flex-col dark:bg-zinc-950">
+            <div v-show="!isSidebarCollapsed" class="absolute top-0 left-0 h-full z-30 bg-white flex w-72 flex-col dark:bg-zinc-950 shadow-xl">
                 <div class="flex grow flex-col overflow-y-auto border-r border-gray-200 bg-white dark:border-zinc-900 dark:bg-zinc-950">
 
                     <!-- navigation -->
@@ -327,6 +347,7 @@ export default {
 
             reloadInterval: null,
 
+            isSidebarCollapsed: localStorage.getItem('sidebarCollapsed') !== 'false',
             isShowingMyIdentitySection: true,
             isShowingAnnounceSection: true,
             isShowingCallsSection: true,
@@ -365,6 +386,14 @@ export default {
 
     },
     methods: {
+        toggleSidebar() {
+            this.isSidebarCollapsed = !this.isSidebarCollapsed;
+            localStorage.setItem('sidebarCollapsed', this.isSidebarCollapsed);
+        },
+        async toggleTheme() {
+            this.config.theme = this.config.theme === 'dark' ? 'light' : 'dark';
+            await this.updateConfig({ "theme": this.config.theme });
+        },
         async onWebsocketMessage(message) {
             const json = JSON.parse(message.data);
             switch(json.type){
