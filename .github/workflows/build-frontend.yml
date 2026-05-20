@@ -1,0 +1,34 @@
+name: Build Frontend Bundle
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v4
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install NodeJS Deps
+        run: npm install
+
+      - name: Build Frontend
+        run: npx vite build
+
+      - name: Upload Frontend Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: meshchat-frontend-public
+          path: public/
