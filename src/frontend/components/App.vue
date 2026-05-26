@@ -4,6 +4,11 @@
         <!-- header -->
         <div class="flex bg-white dark:bg-zinc-950 p-2 border-gray-300 dark:border-zinc-900 border-b min-h-16">
             <div class="flex w-full">
+                <button @click="toggleSidebar" class="my-auto mr-2 p-1.5 rounded-md text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-zinc-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
                 <div class="hidden sm:flex my-auto w-12 h-12 mr-2">
                     <img class="w-12 h-12" src="/assets/images/logo-chat-bubble.png" />
                 </div>
@@ -15,6 +20,16 @@
                     </div>
                 </div>
                 <div class="flex my-auto ml-auto mr-0 sm:mr-2 space-x-1 sm:space-x-2">
+                    <button @click="toggleTheme" type="button" class="rounded-full">
+                        <span class="flex text-gray-700 dark:text-white bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-600 px-2 py-1 rounded-full">
+                            <svg v-if="config?.theme === 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                            </svg>
+                        </span>
+                    </button>
                     <button @click="syncPropagationNode" type="button" class="rounded-full">
                         <span class="flex text-gray-700 dark:text-white bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-600 px-2 py-1 rounded-full">
                             <span :class="{ 'animate-spin': isSyncingPropagationNode }">
@@ -43,8 +58,8 @@
         <div ref="middle" class="flex h-full w-full overflow-auto">
 
             <!-- sidebar -->
-            <div class="bg-white flex w-72 min-w-72 flex-col dark:bg-zinc-950">
-                <div class="flex grow flex-col overflow-y-auto border-r border-gray-200 bg-white dark:border-zinc-900 dark:bg-zinc-950">
+            <div :class="isSidebarCollapsed ? 'w-16 min-w-16' : 'w-72 min-w-72'" class="bg-white flex flex-col dark:bg-zinc-950 transition-all duration-200">
+                <div class="flex grow flex-col overflow-y-auto overflow-x-hidden border-r border-gray-200 bg-white dark:border-zinc-900 dark:bg-zinc-950">
 
                     <!-- navigation -->
                     <div class="flex-1">
@@ -52,7 +67,7 @@
 
                             <!-- messages -->
                             <li>
-                                <SidebarLink :to="{ name: 'messages' }">
+                                <SidebarLink :to="{ name: 'messages' }" :collapsed="isSidebarCollapsed">
                                     <template v-slot:icon>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 dark:texwhite">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
@@ -67,7 +82,7 @@
 
                             <!-- nomad network -->
                             <li>
-                                <SidebarLink :to="{ name: 'nomadnetwork' }">
+                                <SidebarLink :to="{ name: 'nomadnetwork' }" :collapsed="isSidebarCollapsed">
                                     <template v-slot:icon>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
@@ -79,7 +94,7 @@
 
                             <!-- interfaces -->
                             <li>
-                                <SidebarLink :to="{ name: 'interfaces' }">
+                                <SidebarLink :to="{ name: 'interfaces' }" :collapsed="isSidebarCollapsed">
                                     <template v-slot:icon>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 256 256">
                                             <path d="M232,112H136V88h8a16,16,0,0,0,16-16V40a16,16,0,0,0-16-16H112A16,16,0,0,0,96,40V72a16,16,0,0,0,16,16h8v24H24a8,8,0,0,0,0,16H56v32H48a16,16,0,0,0-16,16v32a16,16,0,0,0,16,16H80a16,16,0,0,0,16-16V176a16,16,0,0,0-16-16H72V128H184v32h-8a16,16,0,0,0-16,16v32a16,16,0,0,0,16,16h32a16,16,0,0,0,16-16V176a16,16,0,0,0-16-16h-8V128h32a8,8,0,0,0,0-16ZM112,40h32V72H112ZM80,208H48V176H80Zm128,0H176V176h32Z"></path>
@@ -91,7 +106,7 @@
 
                             <!-- network visualiser -->
                             <li>
-                                <SidebarLink :to="{ name: 'network-visualiser' }">
+                                <SidebarLink :to="{ name: 'network-visualiser' }" :collapsed="isSidebarCollapsed">
                                     <template v-slot:icon>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 256 256" class="w-6 h-6">
                                             <path d="M200,152a31.84,31.84,0,0,0-19.53,6.68l-23.11-18A31.65,31.65,0,0,0,160,128c0-.74,0-1.48-.08-2.21l13.23-4.41A32,32,0,1,0,168,104c0,.74,0,1.48.08,2.21l-13.23,4.41A32,32,0,0,0,128,96a32.59,32.59,0,0,0-5.27.44L115.89,81A32,32,0,1,0,96,88a32.59,32.59,0,0,0,5.27-.44l6.84,15.4a31.92,31.92,0,0,0-8.57,39.64L73.83,165.44a32.06,32.06,0,1,0,10.63,12l25.71-22.84a31.91,31.91,0,0,0,37.36-1.24l23.11,18A31.65,31.65,0,0,0,168,184a32,32,0,1,0,32-32Zm0-64a16,16,0,1,1-16,16A16,16,0,0,1,200,88ZM80,56A16,16,0,1,1,96,72,16,16,0,0,1,80,56ZM56,208a16,16,0,1,1,16-16A16,16,0,0,1,56,208Zm56-80a16,16,0,1,1,16,16A16,16,0,0,1,112,128Zm88,72a16,16,0,1,1,16-16A16,16,0,0,1,200,200Z"></path>
@@ -103,7 +118,7 @@
 
                             <!-- tools -->
                             <li>
-                                <SidebarLink :to="{ name: 'tools' }">
+                                <SidebarLink :to="{ name: 'tools' }" :collapsed="isSidebarCollapsed">
                                     <template v-slot:icon>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
@@ -115,7 +130,7 @@
 
                             <!-- settings -->
                             <li>
-                                <SidebarLink :to="{ name: 'settings' }">
+                                <SidebarLink :to="{ name: 'settings' }" :collapsed="isSidebarCollapsed">
                                     <template v-slot:icon>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
@@ -128,7 +143,7 @@
 
                             <!-- info -->
                             <li>
-                                <SidebarLink :to="{ name: 'about' }">
+                                <SidebarLink :to="{ name: 'about' }" :collapsed="isSidebarCollapsed">
                                     <template v-slot:icon>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
@@ -141,9 +156,7 @@
                         </ul>
                     </div>
 
-                    <div>
-
-                        <!-- my identity -->
+                    <div v-show="!isSidebarCollapsed">
                         <div v-if="config" class="bg-white border-t dark:border-zinc-900 dark:bg-zinc-950">
                             <div @click="isShowingMyIdentitySection = !isShowingMyIdentitySection" class="flex text-gray-700 p-2 cursor-pointer">
                                 <div class="my-auto mr-2">
@@ -327,6 +340,8 @@ export default {
 
             reloadInterval: null,
 
+            isSidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
+
             isShowingMyIdentitySection: true,
             isShowingAnnounceSection: true,
             isShowingCallsSection: true,
@@ -365,6 +380,14 @@ export default {
 
     },
     methods: {
+        toggleSidebar() {
+            this.isSidebarCollapsed = !this.isSidebarCollapsed;
+            localStorage.setItem('sidebarCollapsed', this.isSidebarCollapsed);
+        },
+        async toggleTheme() {
+            this.config.theme = this.config.theme === 'dark' ? 'light' : 'dark';
+            await this.updateConfig({ "theme": this.config.theme });
+        },
         async onWebsocketMessage(message) {
             const json = JSON.parse(message.data);
             switch(json.type){
